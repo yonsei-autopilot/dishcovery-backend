@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>메뉴 설명</title>
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-4">
+    <h1 class="text-xl font-bold">📸 메뉴 사진으로 음식 설명 받기</h1>
+
+    <form
+        hx-post="/menus/explanation"
+        hx-encoding="multipart/form-data"
+        hx-target="#result"
+        hx-swap="none"
+        class="space-y-4"
+    >
+        <input type="file" name="image" accept="image/*" required class="block w-full text-sm text-gray-700" />
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">
+            설명 요청
+        </button>
+    </form>
+
+    <div id="result" class="text-sm text-gray-800 whitespace-pre-line border-t pt-4 min-h-[100px]"></div>
+  </div>
+
+  <script>
+    document.body.addEventListener('htmx:afterRequest', function (event) {
+      if (event.target.getAttribute('hx-post') === '/menus/explanation') {
+        const xhr = event.detail.xhr;
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (res.success && res.data?.explanation) {
+            document.getElementById('result').innerText = res.data.explanation;
+          } else if (res.error?.message) {
+            document.getElementById('result').innerText = '❌ ' + res.error.message;
+          } else {
+            document.getElementById('result').innerText = '❌ 설명 생성에 실패했습니다.';
+          }
+        } catch {
+          document.getElementById('result').innerText = '❌ JSON 파싱 오류';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

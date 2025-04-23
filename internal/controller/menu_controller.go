@@ -24,7 +24,7 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	format, err := util.DetectImageFormat(file)
+	format, err := util.DetectImageFormat(imageBytes)
 	if err != nil {
 		encoder.Failure(w, dto.NewApiError("INVALID_IMAGE_FORMAT", "Unsupported or corrupt image", http.StatusBadRequest))
 		return
