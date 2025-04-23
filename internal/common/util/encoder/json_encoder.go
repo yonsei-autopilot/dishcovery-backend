@@ -1,4 +1,4 @@
-package util
+package encoder
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/dto"
 )
 
-func JSON(w http.ResponseWriter, status int, data interface{}) {
+func Success(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 
@@ -17,7 +17,7 @@ func JSON(w http.ResponseWriter, status int, data interface{}) {
 	})
 }
 
-func Error(w http.ResponseWriter, apiErr *dto.ApiError) {
+func Failure(w http.ResponseWriter, apiErr *dto.ApiError) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(apiErr.Status)
 
