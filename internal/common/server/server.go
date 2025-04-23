@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/middleware"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/controller"
-	"github.com/yonsei-autopilot/smart-menu-backend/internal/middleware"
 )
 
 func Start() {

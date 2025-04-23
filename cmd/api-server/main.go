@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/yonsei-autopilot/smart-menu-backend/internal/config"
-	"github.com/yonsei-autopilot/smart-menu-backend/internal/server"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/server"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util"
 )
 
 func main() {
-	config.LoadEnv()
+	util.LoadEnv()
 	server.Start()
 }

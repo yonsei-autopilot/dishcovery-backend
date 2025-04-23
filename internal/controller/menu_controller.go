@@ -1,48 +1,43 @@
 package controller
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/dto"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/service"
 )
 
-type responseBody struct {
-	Explanation string `json:"explanation,omitempty"`
-	Error       string `json:"error,omitempty"`
-}
-
-func uploadMenuImage(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
+func explainMenu(w http.ResponseWriter, r *http.Request) {
 	file, _, err := r.FormFile("image")
 	if err != nil {
-		writeJsonError(w, "Failed to read image", http.StatusBadRequest)
+		util.Error(w, dto.NewApiError("INVALID_IMAGE", "Failed to read image", http.StatusBadRequest))
 		return
 	}
 	defer file.Close()
 
 	imageBytes, err := io.ReadAll(file)
 	if err != nil {
-		writeJsonError(w, "Could not read image data", http.StatusInternalServerError)
+		util.Error(w, dto.NewApiError("IMAGE_READ_FAILED", "Could not read image data", http.StatusBadRequest))
 		return
 	}
 
-	response, err := service.SendToGemini(imageBytes)
+	format, err := util.DetectImageFormat(file)
 	if err != nil {
-		writeJsonError(w, "Failed to process image with Gemini", http.StatusInternalServerError)
+		util.Error(w, dto.NewApiError("INVALID_IMAGE_FORMAT", "Unsupported or corrupt image", http.StatusBadRequest))
+		return
+	}
+	if format != "jpeg" && format != "jpg" && format != "png" {
+		util.Error(w, dto.NewApiError("UNSUPPORTED_FORMAT", "Only JPEG, JPG, PNG images are allowed", http.StatusUnsupportedMediaType))
 		return
 	}
 
-	json.NewEncoder(w).Encode(responseBody{
-		Explanation: response,
-	})
-}
+	explanation, err := service.ExplainMenu(imageBytes, format)
+	if err != nil {
+		util.Error(w, dto.NewApiError("GEMINI_PROCESS_FAILED", err.Error(), http.StatusOK))
+		return
+	}
 
-func writeJsonError(w http.ResponseWriter, message string, status int) {
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(responseBody{
-		Error: message,
-	})
+	util.JSON(w, http.StatusOK, dto.MenuExplanationResponse{Explanation: explanation})
 }

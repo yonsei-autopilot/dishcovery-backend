@@ -6,5 +6,5 @@ import (
 
 func RegisterRoutes(handler *http.ServeMux) {
 	handler.HandleFunc("GET /health", checkHealth)
-	handler.HandleFunc("POST /menu-image", uploadMenuImage)
+	handler.HandleFunc("POST /menu-image", explainMenu)
 }
