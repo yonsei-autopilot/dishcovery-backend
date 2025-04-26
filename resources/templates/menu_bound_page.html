@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>메뉴 설명</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md space-y-4">
+      <h1 class="text-xl font-bold">📸 메뉴 사진으로 음식 Bounding Box 받기</h1>
+
+      <!-- 이미지 업로드 -->
+      <input
+        id="imageInput"
+        type="file"
+        accept="image/*"
+        required
+        class="block w-full text-sm text-gray-700"
+      />
+
+      <!-- 캔버스 -->
+      <canvas
+        id="canvas"
+        class="w-full border rounded"
+        style="display: none"
+      ></canvas>
+
+      <!-- 실행 버튼 -->
+      <button
+        id="submitButton"
+        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+      >
+        실행
+      </button>
+
+      <!-- 결과 영역 -->
+      <div
+        id="result"
+        class="text-sm text-gray-800 whitespace-pre-line border-t pt-4 min-h-[100px]"
+      ></div>
+    </div>
+
+    <script>
+      const imageInput = document.getElementById("imageInput");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const submitButton = document.getElementById("submitButton");
+      const resultDiv = document.getElementById("result");
+
+      let uploadedImage = null; // 업로드한 이미지 저장용
+
+      // 이미지가 선택되었을 때 실행
+      imageInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const img = new Image();
+          img.onload = function () {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            canvas.style.display = "block"; // 캔버스 표시
+            uploadedImage = img;
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // 버튼 클릭 시 서버로 이미지 전송
+      submitButton.addEventListener("click", async () => {
+        if (!uploadedImage) {
+          alert("이미지를 먼저 업로드해주세요.");
+          return;
+        }
+
+        // canvas 내용을 Blob으로 변환
+        canvas.toBlob(async (blob) => {
+          const formData = new FormData();
+          formData.append("image", blob, "uploaded_image.png");
+
+          try {
+            submitButton.disabled = true;
+            submitButton.classList.add("opacity-50", "cursor-not-allowed");
+
+            const response = await fetch("/menus/bound", {
+              // 서버의 엔드포인트에 맞게 수정
+              method: "POST",
+              body: formData,
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+
+              console.log(result);
+
+              const boundBox = JSON.parse(result.data.explanation);
+
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.drawImage(uploadedImage, 0, 0);
+
+              // bounding box 그리기
+              ctx.strokeStyle = "red";
+              ctx.lineWidth = 5;
+              ctx.font = "64px sans-serif";
+              ctx.fillStyle = "red";
+
+              for (const item of boundBox) {
+                console.log(item);
+                const [y1, x1, y2, x2] = item.box_2d;
+                const label = item.label;
+
+                // 정규화된 좌표를 캔버스 크기로 변환
+                const startX = (x1 / 1000) * canvas.width;
+                const startY = (y1 / 1000) * canvas.height;
+                const endX = (x2 / 1000) * canvas.width;
+                const endY = (y2 / 1000) * canvas.height;
+                const width = endX - startX;
+                const height = endY - startY;
+
+                ctx.strokeRect(startX, startY, width, height);
+                ctx.fillText(label, startX + 4, startY + 16); // 상자 위에 라벨
+              }
+            } else {
+              resultDiv.textContent = "서버 오류가 발생했습니다.";
+            }
+          } catch (error) {
+            console.error(error);
+            resultDiv.textContent = "전송 실패: 네트워크 오류";
+          } finally {
+            submitButton.disabled = false;
+            submitButton.classList.remove("opacity-50", "cursor-not-allowed");
+          }
+        }, "image/png");
+      });
+    </script>
+  </body>
+</html>
