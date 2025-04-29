@@ -11,19 +11,18 @@ import (
 )
 
 var (
-	once    sync.Once
-	client  *genai.Client
-	initErr error
+	once   sync.Once
+	client *genai.Client
 )
 
 type GeminiRequest struct {
-	ctx              context.Context
-	modelName        string
-	prompt           string
-	imageBytes       []byte
-	imageFormat      string
-	structuredOutput bool
-	structObj        any
+	ctx                context.Context
+	modelName          string
+	prompt             string
+	imageBytes         []byte
+	imageFormat        string
+	isStructuredOutput bool
+	structObj          any
 }
 
 // initialize sets up the Gemini client.
@@ -32,25 +31,22 @@ func initialize() {
 
 	apiKey, err := util.GetEnv("GEMINI_API_KEY")
 	if err != nil {
-		initErr = errors.New("missing Gemini API key")
-		return
+		panic("missing Gemini API key")
 	}
 
 	newClient, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
-		initErr = errors.New("failed to create Gemini client")
-		return
+		panic("failed to create Gemini client")
 	}
 
 	client = newClient
 }
 
 // InitializeGeminiClient initializes the Gemini client only once using sync.Once.
-func InitializeGeminiClient() error {
+func InitializeGeminiClient() {
 	once.Do(func() {
 		initialize()
 	})
-	return initErr
 }
 
 // GeminiRequestBuilder creates GeminiRequest
@@ -80,7 +76,7 @@ func (req *GeminiRequest) WithImage(imageBytes []byte, format string) *GeminiReq
 }
 
 func (req *GeminiRequest) ExpectStructuredOutput(obj any) *GeminiRequest {
-	req.structuredOutput = true
+	req.isStructuredOutput = true
 	req.structObj = obj
 	return req
 }
@@ -98,7 +94,7 @@ func (req *GeminiRequest) Generate() (string, error) {
 	model := client.GenerativeModel(req.modelName)
 
 	// Structured Output 모드일 경우 ResponseMIMEType과 Schema 설정
-	if req.structuredOutput {
+	if req.isStructuredOutput {
 		model.ResponseMIMEType = "application/json"
 		schema := StructToSchema(req.structObj)
 		model.ResponseSchema = schema
@@ -124,7 +120,7 @@ func (req *GeminiRequest) Generate() (string, error) {
 	resultString := accumulateContent(resp.Candidates[0].Content)
 
 	// Structured Output 모드일 경우 output 객체에 unmarshall
-	if req.structuredOutput {
+	if req.isStructuredOutput {
 		err := JsonToStruct(resultString, req.structObj)
 		if err != nil {
 			return "", errors.New("gemini failed to unmarshall structured output")
