@@ -17,6 +17,11 @@ func Start() {
 		Handler: middleware.Logging(handler),
 	}
 
-	server.ListenAndServe()
-	log.Println("Server running")
+	log.Printf("Server listening on %s\n", server.Addr)
+	err := server.ListenAndServe()
+
+	if err != nil && err != http.ErrServerClosed {
+		log.Println("Server exited with error")
+		log.Panicln(err)
+	}
 }
