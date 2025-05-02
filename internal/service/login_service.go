@@ -1,31 +1,28 @@
 package service
 
 import (
+	"context"
 	"fmt"
-	"net/http"
 
-	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/codec"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/dto"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
-func GetUserInfoFromGoogle(accessToken string) (*dto.LoginResponse, error) {
-	req, _ := http.NewRequest("GET", "https://www.googleapis.com/oauth2/v2/userinfo", nil)
-	req.Header.Add("Authorization", "Bearer "+accessToken)
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("userinfo API error: %s", resp.Status)
-	}
-
-	userInfo, err := codec.DecodeRes[dto.LoginResponse](resp)
+func GoogleLogin(ctx context.Context, accessToken string) (*dto.LoginResponse, error) {
+	userInfo, err := repository.FetchUserInfo(accessToken)
 	if err != nil {
 		return nil, err
 	}
 
-	return userInfo, nil
+	user, err := repository.GetUserById(ctx, userInfo.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, fmt.Errorf("user does not exist")
+	}
+
+	// TODO - jwt 발급해야 함
+	return &dto.LoginResponse{AccessToken: "a", RefreshToken: "r"}, nil
 }
