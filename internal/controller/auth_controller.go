@@ -20,7 +20,7 @@ func googleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, err := service.GetUserInfoFromGoogle(req.AccessToken)
+	response, err := service.GoogleLogin(r.Context(), req.AccessToken)
 	if err != nil {
 		codec.Failure(w, dto.NewApiError("Failed to fetch user info", err.Error(), http.StatusUnauthorized))
 		return
