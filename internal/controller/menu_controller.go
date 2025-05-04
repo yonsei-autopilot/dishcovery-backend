@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"errors"
 	"io"
 	"net/http"
 
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/codec"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/dto"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/service"
 )
 
@@ -34,9 +36,10 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var fail *fail.Fail
 	explanation, err := service.ExplainMenu(imageBytes, format)
-	if err != nil {
-		codec.Failure(w, dto.NewApiError("GEMINI_PROCESS_FAILED", err.Error(), http.StatusOK))
+	if errors.As(err, &fail) {
+		codec.FailureFromFail(w, fail)
 		return
 	}
 
