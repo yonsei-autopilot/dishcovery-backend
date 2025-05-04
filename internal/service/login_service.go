@@ -2,25 +2,29 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/dto"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
 func GoogleLogin(ctx context.Context, accessToken string) (*dto.LoginResponse, error) {
 	userInfo, err := repository.FetchUserInfo(accessToken)
 	if err != nil {
-		return nil, err
+		return nil, &fail.UserNotGoogleAuthenticated
 	}
 
-	user, err := repository.GetUserById(ctx, userInfo.Id)
+	_, err = repository.GetUserById(ctx, userInfo.Id)
 	if err != nil {
-		return nil, err
-	}
+		newUser := userInfo.ToUser(time.Now())
 
-	if user == nil {
-		return nil, fmt.Errorf("user does not exist")
+		_, err = repository.AddUser(ctx, newUser)
+		if err != nil {
+			return nil, &fail.FailedSavingUser
+		}
+
+		return nil, &fail.UserNotFullyRegistered
 	}
 
 	// TODO - jwt 발급해야 함

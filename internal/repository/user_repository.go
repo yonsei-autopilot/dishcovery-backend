@@ -11,17 +11,19 @@ import (
 
 func AddUser(ctx context.Context, user *domain.User) (string, error) {
 	client := firebase.GetClient()
+
 	ref, _, err := client.Collection("users").Add(ctx, user)
 	if err != nil {
 		return "", fmt.Errorf("failed to add user: %w", err)
 	}
+
 	return ref.ID, nil
 }
 
 func GetAllUsers(ctx context.Context) ([]domain.User, error) {
 	client := firebase.GetClient()
-	iter := client.Collection("users").Documents(ctx)
 
+	iter := client.Collection("users").Documents(ctx)
 	var users []domain.User
 	for {
 		doc, err := iter.Next()
@@ -36,20 +38,24 @@ func GetAllUsers(ctx context.Context) ([]domain.User, error) {
 		}
 		users = append(users, u)
 	}
+
 	return users, nil
 }
 
 func GetUserById(ctx context.Context, id string) (*domain.User, error) {
 	client := firebase.GetClient()
+
 	doc, err := client.Collection("users").Doc(id).Get(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch user by ID %s: %w", id, err)
 	}
+
 	var user domain.User
 	err = doc.DataTo(&user)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode user data: %w", err)
 	}
+
 	return &user, nil
 }
 
@@ -66,5 +72,6 @@ func GetUserByName(ctx context.Context, name string) (*domain.User, error) {
 	if err := doc.DataTo(&user); err != nil {
 		return nil, fmt.Errorf("failed to decode user data: %w", err)
 	}
+
 	return &user, nil
 }

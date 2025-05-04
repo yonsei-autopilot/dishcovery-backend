@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/codec"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/dto"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/service"
 )
 
@@ -21,8 +23,9 @@ func googleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response, err := service.GoogleLogin(r.Context(), req.AccessToken)
-	if err != nil {
-		codec.Failure(w, dto.NewApiError("Failed to fetch user info", err.Error(), http.StatusUnauthorized))
+	var fail *fail.Fail
+	if errors.As(err, &fail) {
+		codec.FailureFromFail(w, fail)
 		return
 	}
 

@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
+
 type ApiError struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -18,8 +20,16 @@ func (e *ApiError) Error() string {
 	return e.Message
 }
 
+func From(fail fail.Fail) *ApiError {
+	return &ApiError{
+		Code:    fail.Code,
+		Message: fail.Message,
+		Status:  fail.Status,
+	}
+}
+
 type ApiResponse struct {
-	Success bool        `json:"success"`
-	Data    interface{} `json:"data,omitempty"`
-	Error   *ApiError   `json:"error,omitempty"`
+	IsSuccess bool        `json:"isSuccess"`
+	Data      interface{} `json:"data,omitempty"`
+	Error     *ApiError   `json:"error,omitempty"`
 }
