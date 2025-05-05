@@ -6,8 +6,13 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/domain"
 )
 
-type LoginRequest struct {
+type GoogleLoginRequest struct {
 	AccessToken string `json:"accessToken"`
+}
+
+type SimpleLoginRequest struct {
+	LoginId  string `json:"loginId"`
+	Password string `json:"password"`
 }
 
 type LoginResponse struct {
@@ -23,10 +28,10 @@ type UserInfoResponse struct {
 
 func (u *UserInfoResponse) ToUser(now time.Time) *domain.User {
 	return &domain.User{
-		Id:           u.Id,
 		Name:         u.Name,
-		DislikeFoods: "",
+		Language:     nil,
+		DislikeFoods: nil,
 		CreatedAt:    now,
-		LastLogin:    time.Time{},
+		LastLogin:    nil,
 	}
 }
