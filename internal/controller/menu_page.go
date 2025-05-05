@@ -6,13 +6,13 @@ import (
 	"text/template"
 )
 
-var menuExplainPageTmpl = template.Must(template.ParseFiles(
-	filepath.Join("resources", "templates", "menu_explanation_page.html"),
+var menuTranslationPageTmpl = template.Must(template.ParseFiles(
+	filepath.Join("resources", "templates", "menu_translation_page.html"),
 ))
 
-func renderMenuExplanationPage(w http.ResponseWriter, r *http.Request) {
+func renderMenuTranslationPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	err := menuExplainPageTmpl.Execute(w, nil)
+	err := menuTranslationPageTmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "템플릿 렌더링 오류", http.StatusInternalServerError)
 	}

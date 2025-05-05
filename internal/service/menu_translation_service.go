@@ -10,7 +10,7 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
-func ExplainMenu(ctx context.Context, id string, imageBytes []byte, imageFormat string) (*domain.Menu, *fail.Fail) {
+func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageFormat string) (*domain.Menu, *fail.Fail) {
 	user, err := repository.GetUserById(ctx, id)
 	if err != nil {
 		return nil, &fail.UserNotFound
