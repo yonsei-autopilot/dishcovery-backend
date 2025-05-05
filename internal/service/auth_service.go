@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/token"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/domain"
 	dto "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/auth"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
@@ -24,8 +25,12 @@ func GoogleLogin(ctx context.Context, accessToken string) (*dto.LoginResponse, *
 
 	updateLastLogin(ctx, id, user)
 
-	// TODO - jwt 발급해야 함
-	return &dto.LoginResponse{AccessToken: "a", RefreshToken: "r"}, nil
+	accessToken, refreshToken, fail := token.CreateTokens(id)
+	if fail != nil {
+		return nil, fail
+	}
+
+	return &dto.LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
 }
 
 func SimpleLogin(ctx context.Context, req *dto.SimpleLoginRequest) (*dto.LoginResponse, *fail.Fail) {
@@ -38,8 +43,12 @@ func SimpleLogin(ctx context.Context, req *dto.SimpleLoginRequest) (*dto.LoginRe
 
 	updateLastLogin(ctx, id, user)
 
-	// TODO - jwt 발급해야 함
-	return &dto.LoginResponse{AccessToken: "a", RefreshToken: "r"}, nil
+	accessToken, refreshToken, fail := token.CreateTokens(id)
+	if fail != nil {
+		return nil, fail
+	}
+
+	return &dto.LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
 }
 
 func Register(ctx context.Context, req *dto.RegisterRequest) *fail.Fail {
