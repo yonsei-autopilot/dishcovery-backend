@@ -8,15 +8,15 @@ import (
 )
 
 type RegisterRequest struct {
-	LoginId      string `json:"loginId"`
-	Password     string `json:"password"`
-	Name         string `json:"name"`
-	Language     string `json:"language"`
-	DislikeFoods string `json:"dislikeFoods"`
+	LoginId      string   `json:"loginId"`
+	Password     string   `json:"password"`
+	Name         string   `json:"name"`
+	Language     string   `json:"language"`
+	DislikeFoods []string `json:"dislikeFoods"`
 }
 
 func (r *RegisterRequest) Validate() *fail.Fail {
-	if r.LoginId == "" || r.Password == "" || r.Name == "" || r.Language == "" || r.DislikeFoods == "" {
+	if r.LoginId == "" || r.Password == "" || r.Name == "" || r.Language == "" || len(r.DislikeFoods) == 0 {
 		return &fail.RequestValidationFailed
 	}
 	return nil

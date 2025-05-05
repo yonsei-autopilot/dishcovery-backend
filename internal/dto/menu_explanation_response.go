@@ -2,7 +2,7 @@ package dto
 
 import "github.com/yonsei-autopilot/smart-menu-backend/internal/domain"
 
-type MenuExplanationResponse struct {
+type MenuTranslationResponse struct {
 	Items []MenuItemResponse `json:"items"`
 }
 
@@ -12,7 +12,7 @@ type MenuItemResponse struct {
 	Price       float32 `json:"price"`
 }
 
-func FromMenu(menu *domain.Menu) *MenuExplanationResponse {
+func FromMenu(menu *domain.Menu) *MenuTranslationResponse {
 	items := make([]MenuItemResponse, len(menu.Items))
 	for i, item := range menu.Items {
 		items[i] = MenuItemResponse{
@@ -21,5 +21,5 @@ func FromMenu(menu *domain.Menu) *MenuExplanationResponse {
 			Price:       item.Price,
 		}
 	}
-	return &MenuExplanationResponse{Items: items}
+	return &MenuTranslationResponse{Items: items}
 }

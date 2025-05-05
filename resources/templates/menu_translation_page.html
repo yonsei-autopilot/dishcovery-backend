@@ -11,7 +11,7 @@
     <h1 class="text-xl font-bold">📸 메뉴 사진으로 음식 설명 받기</h1>
 
     <form
-        hx-post="/menus/explanation"
+        hx-post="/menus/translation"
         hx-encoding="multipart/form-data"
         hx-target="#result"
         hx-swap="none"
@@ -28,12 +28,12 @@
 
   <script>
     document.body.addEventListener('htmx:afterRequest', function (event) {
-      if (event.target.getAttribute('hx-post') === '/menus/explanation') {
+      if (event.target.getAttribute('hx-post') === '/menus/translation') {
         const xhr = event.detail.xhr;
         try {
           const res = JSON.parse(xhr.responseText);
-          if (res.success && res.data?.explanation) {
-            document.getElementById('result').innerText = res.data.explanation;
+          if (res.success && res.data?.translation) {
+            document.getElementById('result').innerText = res.data.translation;
           } else if (res.error?.message) {
             document.getElementById('result').innerText = '❌ ' + res.error.message;
           } else {

@@ -12,7 +12,7 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/service"
 )
 
-func explainMenu(w http.ResponseWriter, r *http.Request) {
+func translateMenu(w http.ResponseWriter, r *http.Request) {
 	file, _, err := r.FormFile("image")
 	if err != nil {
 		codec.Failure(w, &fail.InvalidImage)
@@ -42,13 +42,13 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	menuExplanation, fail := service.ExplainMenu(r.Context(), id, imageBytes, format)
+	menuTranslation, fail := service.TranslateMenu(r.Context(), id, imageBytes, format)
 	if fail != nil {
 		codec.Failure(w, fail)
 		return
 	}
 
-	menuExplanationDto := dto.FromMenu(menuExplanation)
+	menuTranslationDto := dto.FromMenu(menuTranslation)
 
-	codec.Success(w, http.StatusOK, menuExplanationDto)
+	codec.Success(w, http.StatusOK, menuTranslationDto)
 }
