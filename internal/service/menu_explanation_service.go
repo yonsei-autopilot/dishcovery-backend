@@ -10,16 +10,6 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
-type Menu struct {
-	Items []Item `json:"items" genai:"description=Menu items list;required"`
-}
-
-type Item struct {
-	Name        string  `json:"name" genai:"description=Item name;required"`
-	Description string  `json:"description" genai:"description=Description of the item. Do not include any item name or price info.;required"`
-	Price       float32 `json:"price" genai:"description=Price of item"`
-}
-
 func ExplainMenu(ctx context.Context, id string, imageBytes []byte, imageFormat string) (string, *fail.Fail) {
 	user, err := repository.GetUserById(ctx, id)
 	if err != nil {
@@ -27,7 +17,7 @@ func ExplainMenu(ctx context.Context, id string, imageBytes []byte, imageFormat 
 	}
 
 	prompt := createPrompt(user)
-	output := &Menu{}
+	output := &domain.Menu{}
 
 	result, err := gemini.GeminiRequestBuilder().
 		WithContext(ctx).
