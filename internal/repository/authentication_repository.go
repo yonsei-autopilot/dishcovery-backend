@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/codec"
-	"github.com/yonsei-autopilot/smart-menu-backend/internal/dto"
+	dto "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/auth"
 )
 
 func FetchUserInfo(accessToken string) (*dto.UserInfoResponse, error) {
