@@ -71,3 +71,24 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 	codec.Success(w, http.StatusOK, nil)
 }
+
+func refresh(w http.ResponseWriter, r *http.Request) {
+	req, err := codec.DecodeReq[dto.RefreshRequest](r)
+	if err != nil {
+		codec.Failure(w, &fail.InvalidJsonBody)
+		return
+	}
+
+	if fail := req.Validate(); fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	response, fail := service.Refresh(r.Context(), req)
+	if fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	codec.Success(w, http.StatusOK, response)
+}

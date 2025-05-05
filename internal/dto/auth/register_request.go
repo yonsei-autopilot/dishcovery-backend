@@ -24,11 +24,13 @@ func (r *RegisterRequest) Validate() *fail.Fail {
 
 func (r *RegisterRequest) ToUser(now time.Time) *domain.User {
 	return &domain.User{
+		Password:     r.Password,
 		Name:         r.Name,
-		Language:     &r.Language,
-		DislikeFoods: &r.DislikeFoods,
+		Language:     r.Language,
+		DislikeFoods: r.DislikeFoods,
 		AuthProvider: "simple",
+		RefreshToken: "",
 		CreatedAt:    now,
-		LastLogin:    nil,
+		LastLogin:    now,
 	}
 }

@@ -23,12 +23,12 @@ func GoogleLogin(ctx context.Context, accessToken string) (*dto.LoginResponse, *
 		return nil, addNewUser(ctx, id, userInfo)
 	}
 
-	updateLastLogin(ctx, id, user)
-
 	accessToken, refreshToken, fail := token.CreateTokens(id)
 	if fail != nil {
 		return nil, fail
 	}
+
+	updateUserLoginInfo(ctx, id, user, refreshToken)
 
 	return &dto.LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
 }
@@ -41,12 +41,16 @@ func SimpleLogin(ctx context.Context, req *dto.SimpleLoginRequest) (*dto.LoginRe
 		return nil, &fail.UserNotFound
 	}
 
-	updateLastLogin(ctx, id, user)
+	if user.Password != req.Password {
+		return nil, &fail.PasswordMismatch
+	}
 
 	accessToken, refreshToken, fail := token.CreateTokens(id)
 	if fail != nil {
 		return nil, fail
 	}
+
+	updateUserLoginInfo(ctx, id, user, refreshToken)
 
 	return &dto.LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
 }
@@ -64,6 +68,29 @@ func Register(ctx context.Context, req *dto.RegisterRequest) *fail.Fail {
 	return nil
 }
 
+func Refresh(ctx context.Context, req *dto.RefreshRequest) (*dto.RefreshResponse, *fail.Fail) {
+	id, failure := token.VerifyRefreshToken(req.RefreshToken)
+	if failure != nil {
+		return nil, failure
+	}
+
+	user, err := repository.GetUserById(ctx, id)
+	if err != nil {
+		return nil, &fail.UserNotFound
+	}
+
+	if user.RefreshToken != req.RefreshToken {
+		return nil, &fail.RefreshTokenMismatch
+	}
+
+	accessToken, fail := token.CreateAccessToken(id)
+	if fail != nil {
+		return nil, fail
+	}
+
+	return &dto.RefreshResponse{AccessToken: accessToken}, nil
+}
+
 func addNewUser(ctx context.Context, id string, userInfo *dto.UserInfoResponse) *fail.Fail {
 	newUser := userInfo.ToUser(time.Now())
 
@@ -75,9 +102,10 @@ func addNewUser(ctx context.Context, id string, userInfo *dto.UserInfoResponse) 
 	return &fail.UserNotFullyRegistered
 }
 
-func updateLastLogin(ctx context.Context, id string, user *domain.User) {
-	now := time.Now()
-	user.LastLogin = &now
+func updateUserLoginInfo(ctx context.Context, id string, user *domain.User, refreshToken string) {
+	user.LastLogin = time.Now()
+
+	user.RefreshToken = refreshToken
 
 	_ = repository.SetUser(ctx, id, user)
 }

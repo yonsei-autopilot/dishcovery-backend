@@ -43,18 +43,8 @@ func ExplainMenu(ctx context.Context, id string, imageBytes []byte, imageFormat 
 }
 
 func createPrompt(user *domain.User) string {
-	lang := "Korean"
-	if user.Language != nil {
-		lang = *user.Language
-	}
-
-	dislikes := "nothing"
-	if user.DislikeFoods != nil {
-		dislikes = *user.DislikeFoods
-	}
-
 	return fmt.Sprintf(
 		"Given a menu, describe each item in %s. Include the dish name, price, and a detailed explanation of its ingredients, flavors, and characteristics. I dislike %s.",
-		lang, dislikes,
+		user.Language, user.DislikeFoods,
 	)
 }

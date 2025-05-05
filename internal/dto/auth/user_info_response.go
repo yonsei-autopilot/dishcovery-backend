@@ -14,11 +14,13 @@ type UserInfoResponse struct {
 
 func (u *UserInfoResponse) ToUser(now time.Time) *domain.User {
 	return &domain.User{
+		Password:     "",
 		Name:         u.Name,
-		Language:     nil,
-		DislikeFoods: nil,
+		Language:     "",
+		DislikeFoods: "",
 		AuthProvider: "google",
+		RefreshToken: "",
 		CreatedAt:    now,
-		LastLogin:    nil,
+		LastLogin:    now,
 	}
 }

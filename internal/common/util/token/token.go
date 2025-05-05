@@ -39,12 +39,12 @@ func CreateTokens(id string) (string, string, *fail.Fail) {
 	return accessToken, refreshToken, nil
 }
 
-func CreateRefreshToken(id string) (string, *fail.Fail) {
-	refreshToken, fail := create(id, refreshTokenDurationHours)
+func CreateAccessToken(id string) (string, *fail.Fail) {
+	accessToken, fail := create(id, accessTokenDurationHours)
 	if fail != nil {
 		return "", fail
 	}
-	return refreshToken, nil
+	return accessToken, nil
 }
 
 func VerifyAccessToken(accessToken string) (string, *fail.Fail) {
