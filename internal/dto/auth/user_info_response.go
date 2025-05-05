@@ -17,7 +17,7 @@ func (u *UserInfoResponse) ToUser(now time.Time) *domain.User {
 		Password:     "",
 		Name:         u.Name,
 		Language:     "",
-		DislikeFoods: "",
+		DislikeFoods: []string{},
 		AuthProvider: "google",
 		RefreshToken: "",
 		CreatedAt:    now,

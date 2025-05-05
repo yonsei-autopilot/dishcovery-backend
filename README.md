@@ -23,7 +23,7 @@ curl -X POST http://localhost:8090/auth/register \
     "password": "strongPassword",
     "name": "New User",
     "language": "English",
-    "dislikeFoods": "Cucumber"
+    "dislikeFoods": ["Cucumber", "Mushroom"]
   }'
 
 curl -X POST http://localhost:8090/auth/login/simple \

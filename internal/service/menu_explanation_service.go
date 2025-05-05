@@ -10,16 +10,16 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
-func ExplainMenu(ctx context.Context, id string, imageBytes []byte, imageFormat string) (string, *fail.Fail) {
+func ExplainMenu(ctx context.Context, id string, imageBytes []byte, imageFormat string) (*domain.Menu, *fail.Fail) {
 	user, err := repository.GetUserById(ctx, id)
 	if err != nil {
-		return "", &fail.UserNotFound
+		return nil, &fail.UserNotFound
 	}
 
 	prompt := createPrompt(user)
 	output := &domain.Menu{}
 
-	result, err := gemini.GeminiRequestBuilder().
+	_, err = gemini.GeminiRequestBuilder().
 		WithContext(ctx).
 		WithModel("gemini-2.0-flash").
 		WithImage(imageBytes, imageFormat).
@@ -27,9 +27,9 @@ func ExplainMenu(ctx context.Context, id string, imageBytes []byte, imageFormat 
 		ExpectStructuredOutput(output).
 		Generate()
 	if err != nil {
-		return "", &fail.FailedDescriptionGeneration
+		return nil, &fail.FailedDescriptionGeneration
 	}
-	return result, nil
+	return output, nil
 }
 
 func createPrompt(user *domain.User) string {
