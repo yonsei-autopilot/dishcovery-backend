@@ -12,6 +12,28 @@
 ### 자잘 팁
 * 프로젝트 루트에 `.env` 파일을 만들고, `GEMINI_API_KEY="실제 발급받은 api key 값"` 이렇게 적어줘야 동작함
 
+* 디버깅용 curl 커맨드
+```sh
+curl http://localhost:8090/health
+
+curl -X POST http://localhost:8090/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "loginId": "newUser123",
+    "password": "strongPassword",
+    "name": "New User",
+    "language": "English",
+    "dislikeFoods": "Cucumber"
+  }'
+
+curl -X POST http://localhost:8090/auth/login/simple \
+  -H "Content-Type: application/json" \
+  -d '{
+    "loginId": "newUser123",
+    "password": "strongPassword"
+  }'
+```
+
 * `/menus/explanation/test-page` 브라우저 접속 > 이미지 선택 > 설명 요청 :: api 동작 확인 가능
 
 <img width="541" alt="스크린샷 2025-04-24 오전 1 23 49" src="https://github.com/user-attachments/assets/404fa6e3-cd3a-4641-a0e5-881700da5c41" />

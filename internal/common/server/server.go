@@ -12,9 +12,11 @@ func Start() {
 	handler := http.NewServeMux()
 	controller.RegisterRoutes(handler)
 
+	wrappedHandler := middleware.Logging(middleware.Authentication(handler))
+
 	server := http.Server{
 		Addr:    ":8090",
-		Handler: middleware.Logging(handler),
+		Handler: wrappedHandler,
 	}
 
 	log.Printf("Server listening on %s\n", server.Addr)

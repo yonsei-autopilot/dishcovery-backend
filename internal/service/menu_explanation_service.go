@@ -2,8 +2,12 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/gemini"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/domain"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
 type Menu struct {
@@ -16,16 +20,31 @@ type Item struct {
 	Price       float32 `json:"price" genai:"description=Price of item"`
 }
 
-func ExplainMenu(imageBytes []byte, imageFormat string) (string, error) {
-	ctx := context.Background()
+func ExplainMenu(ctx context.Context, id string, imageBytes []byte, imageFormat string) (string, *fail.Fail) {
+	user, err := repository.GetUserById(ctx, id)
+	if err != nil {
+		return "", &fail.UserNotFound
+	}
 
+	prompt := createPrompt(user)
 	output := &Menu{}
 
-	return gemini.GeminiRequestBuilder().
+	result, err := gemini.GeminiRequestBuilder().
 		WithContext(ctx).
 		WithModel("gemini-2.0-flash").
 		WithImage(imageBytes, imageFormat).
-		WithPrompt("Given a menu, describe each item in Korean. Include the dish name, price, and a detailed explanation of its ingredients, flavors, and characteristics.").
+		WithPrompt(prompt).
 		ExpectStructuredOutput(output).
 		Generate()
+	if err != nil {
+		return "", &fail.FailedDescriptionGeneration
+	}
+	return result, nil
+}
+
+func createPrompt(user *domain.User) string {
+	return fmt.Sprintf(
+		"Given a menu, describe each item in %s. Include the dish name, price, and a detailed explanation of its ingredients, flavors, and characteristics. I dislike %s.",
+		user.Language, user.DislikeFoods,
+	)
 }
