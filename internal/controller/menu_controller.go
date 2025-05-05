@@ -42,11 +42,13 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	explanation, fail := service.ExplainMenu(r.Context(), id, imageBytes, format)
+	menuExplanation, fail := service.ExplainMenu(r.Context(), id, imageBytes, format)
 	if fail != nil {
 		codec.Failure(w, fail)
 		return
 	}
 
-	codec.Success(w, http.StatusOK, dto.MenuExplanationResponse{Explanation: explanation})
+	menuExplanationDto := dto.FromMenu(menuExplanation)
+
+	codec.Success(w, http.StatusOK, menuExplanationDto)
 }
