@@ -18,17 +18,7 @@ func Success(w http.ResponseWriter, status int, data interface{}) {
 	})
 }
 
-func Failure(w http.ResponseWriter, apiErr *dto.ApiError) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(apiErr.Status)
-
-	json.NewEncoder(w).Encode(dto.ApiResponse{
-		IsSuccess: false,
-		Error:     apiErr,
-	})
-}
-
-func FailureFromFail(w http.ResponseWriter, fail *fail.Fail) {
+func Failure(w http.ResponseWriter, fail *fail.Fail) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(fail.Status)
 

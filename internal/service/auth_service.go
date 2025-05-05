@@ -38,7 +38,7 @@ func SimpleLogin(ctx context.Context, req *dto.SimpleLoginRequest) (*dto.LoginRe
 
 	user, err := repository.GetUserById(ctx, id)
 	if err != nil {
-		return nil, &fail.UserNotRegistered
+		return nil, &fail.UserNotFound
 	}
 
 	updateLastLogin(ctx, id, user)
