@@ -11,7 +11,7 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
 )
 
-func SearchMenuImage(request *dto.MenuExplanationRequest) (*dto.MenuExplanationResponse, *fail.Fail) {
+func SearchMenuImage(request *dto.MenuExplanationRequest) (*dto.ImageSearchResult, *fail.Fail) {
 	adjustedQuery := url.QueryEscape(request.Name) + "+food+dish+photo+-menu+-logo"
 
 	result, fail := search(adjustedQuery, 3)
@@ -19,7 +19,7 @@ func SearchMenuImage(request *dto.MenuExplanationRequest) (*dto.MenuExplanationR
 		return nil, fail
 	}
 
-	return dto.NewMenuExplanationResponse(result), nil
+	return result, nil
 }
 
 func search(adjustedQuery string, count int) (*dto.ImageSearchResult, *fail.Fail) {

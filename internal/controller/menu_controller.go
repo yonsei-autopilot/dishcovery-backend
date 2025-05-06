@@ -65,7 +65,13 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, fail := service.SearchImage(req)
+	id, fail := contextHelper.GetUserId(r.Context())
+	if fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	res, fail := service.SearchImage(r.Context(), id, req)
 	if fail != nil {
 		codec.Failure(w, fail)
 		return

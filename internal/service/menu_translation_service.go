@@ -27,7 +27,7 @@ func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageForma
 		ExpectStructuredOutput(output).
 		Generate()
 	if err != nil {
-		return nil, &fail.FailedDescriptionGeneration
+		return nil, &fail.FailedTranslationGeneration
 	}
 	return output, nil
 }

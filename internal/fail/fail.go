@@ -18,10 +18,11 @@ var (
 	UserNotFullyRegistered      = Fail{Code: "4002", Message: "User Not Fully Registered", Status: http.StatusNotFound}
 	FailedSavingUser            = Fail{Code: "4003", Message: "Failed Saving User", Status: http.StatusInternalServerError}
 	UserNotFound                = Fail{Code: "4004", Message: "User Not Found", Status: http.StatusNotFound}
-	FailedDescriptionGeneration = Fail{Code: "4005", Message: "Failed Description Generation", Status: http.StatusInternalServerError}
+	FailedTranslationGeneration = Fail{Code: "4005", Message: "Failed Translation Generation", Status: http.StatusInternalServerError}
 	PasswordMismatch            = Fail{Code: "4006", Message: "Password Mismatches", Status: http.StatusUnauthorized}
 	RefreshTokenMismatch        = Fail{Code: "4007", Message: "Refresh Token Mismatches", Status: http.StatusUnauthorized}
 	GoogleSearchNotWorking      = Fail{Code: "4008", Message: "Google Search Not Working", Status: http.StatusInternalServerError}
+	FailedExplanationGeneration = Fail{Code: "4009", Message: "Failed Explanation Generation", Status: http.StatusInternalServerError}
 
 	// token related fail
 	FailedCreatingToken   = Fail{Code: "5001", Message: "Failed Creating Token", Status: http.StatusInternalServerError}
