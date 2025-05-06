@@ -29,12 +29,7 @@ type GeminiRequest struct {
 func initialize() {
 	ctx := context.Background()
 
-	apiKey, err := util.GetEnv("GEMINI_API_KEY")
-	if err != nil {
-		panic("missing Gemini API key")
-	}
-
-	newClient, err := genai.NewClient(ctx, option.WithAPIKey(apiKey))
+	newClient, err := genai.NewClient(ctx, option.WithAPIKey(util.GeminiApiKey))
 	if err != nil {
 		panic("failed to create Gemini client")
 	}

@@ -15,16 +15,6 @@ const (
 	issValue                  string  = "dishcovery"
 )
 
-var secretKey string
-
-func InitializeSecretKey() {
-	key, err := util.GetEnv("JWT_SECRET_KEY")
-	if err != nil {
-		panic("missing jwt secret key")
-	}
-	secretKey = key
-}
-
 func CreateTokens(id string) (string, string, *fail.Fail) {
 	accessToken, fail := create(id, accessTokenDurationHours)
 	if fail != nil {
@@ -73,7 +63,7 @@ func create(id string, durationHours float32) (string, *fail.Fail) {
 		"iat": time.Now().Unix(),
 	})
 
-	result, err := token.SignedString([]byte(secretKey))
+	result, err := token.SignedString([]byte(util.JwtSecretKey))
 	if err != nil {
 		return "", &fail.FailedCreatingToken
 	}
@@ -85,7 +75,7 @@ func verify(tokenString string) (string, *fail.Fail) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(secretKey), nil
+		return []byte(util.JwtSecretKey), nil
 	})
 	if err != nil {
 		return "", &fail.SigningMethodMismatch
