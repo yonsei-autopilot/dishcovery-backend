@@ -32,6 +32,8 @@ var (
 	InvalidIssuer         = Fail{Code: "5005", Message: "Invalid Issuer", Status: http.StatusUnauthorized}
 	InvalidSubject        = Fail{Code: "5006", Message: "Invalid Subject", Status: http.StatusUnauthorized}
 	TokenNotInHeader      = Fail{Code: "5007", Message: "Token Not In Header", Status: http.StatusUnauthorized}
+	InvalidSignature      = Fail{Code: "5008", Message: "Token Signature Is Invalid", Status: http.StatusUnauthorized}
+	TokenIsWeird          = Fail{Code: "5009", Message: "Token Is Weird", Status: http.StatusUnauthorized}
 )
 
 type Fail struct {
