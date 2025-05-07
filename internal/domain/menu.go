@@ -5,9 +5,12 @@ type Menu struct {
 }
 
 type Item struct {
-	Name        string  `json:"name" genai:"description=Item name;required"`
-	Description string  `json:"description" genai:"description=Description of the item. Do not include any item name or price info.;required"`
-	Price       float32 `json:"price" genai:"description=Price of item"`
+	OriginalItemName   string   `json:"originalItemName" genai:"description=Item name in original language;required"`
+	TranslatedItemName string   `json:"translatedItemName" genai:"description=Trnalated item name;required"`
+	Label              string   `json:"label" genai:"description=JSON array label;required"`
+	BoundingBox        []int    `json:"box_2d" genai:"description=Item name;required"`
+	Price              float32  `json:"price" genai:"description=Price of the item"`
+	AvailableOptions   []string `json:"availableOptions" genai:"description=An array of translated option names"`
 }
 
 type MenuExplanation struct {
