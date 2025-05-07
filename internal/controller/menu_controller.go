@@ -48,9 +48,7 @@ func translateMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	menuTranslationDto := dto.FromMenu(menuTranslation)
-
-	codec.Success(w, http.StatusOK, menuTranslationDto)
+	codec.Success(w, http.StatusOK, menuTranslation)
 }
 
 func explainMenu(w http.ResponseWriter, r *http.Request) {
