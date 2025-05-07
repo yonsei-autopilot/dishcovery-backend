@@ -23,9 +23,9 @@ type GeminiRequest struct {
 	imageFormat        string
 	isStructuredOutput bool
 	responseType       string
-	temperature        float32
-	topP               float32
-	topK               int32
+	temperature        *float32
+	topP               *float32
+	topK               *int32
 	structObj          any
 }
 
@@ -50,11 +50,7 @@ func InitializeGeminiClient() {
 
 // GeminiRequestBuilder creates GeminiRequest
 func GeminiRequestBuilder() *GeminiRequest {
-	return &GeminiRequest{
-		temperature: 1,
-		topP:        0.6,
-		topK:        64,
-	}
+	return &GeminiRequest{}
 }
 
 func (req *GeminiRequest) WithContext(ctx context.Context) *GeminiRequest {
@@ -78,17 +74,17 @@ func (req *GeminiRequest) WithImage(imageBytes []byte, format string) *GeminiReq
 	return req
 }
 
-func (req *GeminiRequest) WithTemperature(temp float32) *GeminiRequest {
+func (req *GeminiRequest) WithTemperature(temp *float32) *GeminiRequest {
 	req.temperature = temp
 	return req
 }
 
-func (req *GeminiRequest) WithTopP(topp float32) *GeminiRequest {
+func (req *GeminiRequest) WithTopP(topp *float32) *GeminiRequest {
 	req.topP = topp
 	return req
 }
 
-func (req *GeminiRequest) WithTopK(topk int32) *GeminiRequest {
+func (req *GeminiRequest) WithTopK(topk *int32) *GeminiRequest {
 	req.topK = topk
 	return req
 }
@@ -127,9 +123,9 @@ func (req *GeminiRequest) Generate() (string, error) {
 		model.ResponseMIMEType = req.responseType
 	}
 
-	model.TopK = &req.topK
-	model.TopP = &req.topP
-	model.Temperature = &req.temperature
+	model.TopK = req.topK
+	model.TopP = req.topP
+	model.Temperature = req.temperature
 
 	var inputs []genai.Part
 

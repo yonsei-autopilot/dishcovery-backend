@@ -18,11 +18,13 @@ func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageForma
 		return nil, &fail.UserNotFound
 	}
 
+	temperature := float32(0.2)
+
 	boundingBoxResult, err := gemini.GeminiRequestBuilder().
 		WithContext(ctx).
 		WithModel("gemini-2.0-flash").
 		WithImage(imageBytes, imageFormat).
-		WithTemperature(0.2).
+		WithTemperature(&temperature).
 		WithPrompt(createBoundingBoxPrompt()).
 		ExpectResponseType("application/json").
 		Generate()
@@ -37,7 +39,7 @@ func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageForma
 		WithContext(ctx).
 		WithModel("gemini-2.0-flash-001").
 		WithImage(imageBytes, imageFormat).
-		WithTemperature(0.2).
+		WithTemperature(&temperature).
 		WithPrompt(createMenuTranslationPrompt(boundingBoxResult, user.Language)).
 		ExpectStructuredOutput(output).
 		Generate()
