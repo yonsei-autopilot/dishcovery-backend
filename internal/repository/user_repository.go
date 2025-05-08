@@ -21,7 +21,7 @@ func AddUser(ctx context.Context, id string, user *domain.User) error {
 	return nil
 }
 
-func SetUser(ctx context.Context, id string, user *domain.User) error {
+func UpdateUser(ctx context.Context, id string, user *domain.User) error {
 	client := firebase.GetClient()
 
 	_, err := client.Collection("users").Doc(id).Set(ctx, user)
