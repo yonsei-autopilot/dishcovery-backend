@@ -18,4 +18,6 @@ func RegisterRoutes(handler *http.ServeMux) {
 
 	handler.HandleFunc("GET /user/dislike-foods", getDislikeFoods)
 	handler.HandleFunc("PUT /user/dislike-foods", updateDislikeFoods)
+	handler.HandleFunc("GET /user/language", getLanguage)
+	handler.HandleFunc("PUT /user/language", updateLanguage)
 }

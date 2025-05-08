@@ -32,3 +32,28 @@ func UpdateDislikeFoods(ctx context.Context, id string, request *dto.UpdateDisli
 
 	return nil
 }
+
+func GetLanguage(ctx context.Context, id string) (*dto.GetLanguageResponse, *fail.Fail) {
+	user, err := repository.GetUserById(ctx, id)
+	if err != nil {
+		return nil, &fail.UserNotFound
+	}
+
+	return dto.FromLanguage(user.Language), nil
+}
+
+func UpdateLanguage(ctx context.Context, id string, request *dto.UpdateLanguageRequest) *fail.Fail {
+	user, err := repository.GetUserById(ctx, id)
+	if err != nil {
+		return &fail.UserNotFound
+	}
+
+	user.Language = request.Language
+
+	err = repository.UpdateUser(ctx, id, user)
+	if err != nil {
+		return &fail.FailedUpdatingUser
+	}
+
+	return nil
+}
