@@ -12,7 +12,7 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
-func OrderMenu(ctx context.Context, id string, request *dto.MenuOrderRequest) (*dto.MenuOrderResponse, *fail.Fail) {
+func GetMenuOrderTexts(ctx context.Context, id string, request *dto.GetMenuOrderTextsRequest) (*dto.GetMenuOrderTextsResponse, *fail.Fail) {
 	user, err := repository.GetUserById(ctx, id)
 	if err != nil {
 		return nil, &fail.UserNotFound
@@ -34,7 +34,7 @@ func OrderMenu(ctx context.Context, id string, request *dto.MenuOrderRequest) (*
 	return dto.FromMenuOrderAnswer(menuOrder), nil
 }
 
-func getPrompt(user *domain.User, request *dto.MenuOrderRequest) string {
+func getPrompt(user *domain.User, request *dto.GetMenuOrderTextsRequest) string {
 	return fmt.Sprintf(`
 Please generate four statements as follows:
 

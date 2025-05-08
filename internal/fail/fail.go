@@ -24,6 +24,7 @@ var (
 	GoogleSearchNotWorking      = Fail{Code: "4008", Message: "Google Search Not Working", Status: http.StatusInternalServerError}
 	FailedExplanationGeneration = Fail{Code: "4009", Message: "Failed Explanation Generation", Status: http.StatusInternalServerError}
 	FailedUpdatingUser          = Fail{Code: "4010", Message: "Failed Updating User", Status: http.StatusInternalServerError}
+	TtsGenerationFailed         = Fail{Code: "4011", Message: "Tts Generation Failed", Status: http.StatusInternalServerError}
 
 	// token related fail
 	FailedCreatingToken   = Fail{Code: "5001", Message: "Failed Creating Token", Status: http.StatusInternalServerError}

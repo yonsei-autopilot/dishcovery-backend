@@ -1,3 +1,4 @@
 .env
 .vscode
 firebase-application-credentials.json
+google-tts-application-credentials.json
