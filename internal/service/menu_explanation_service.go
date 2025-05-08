@@ -11,7 +11,7 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
-func SearchImage(ctx context.Context, id string, request *dto.MenuExplanationRequest) (*dto.MenuExplanationResponse, *fail.Fail) {
+func ExplainMenu(ctx context.Context, id string, request *dto.MenuExplanationRequest) (*dto.MenuExplanationResponse, *fail.Fail) {
 	user, err := repository.GetUserById(ctx, id)
 	if err != nil {
 		return nil, &fail.UserNotFound

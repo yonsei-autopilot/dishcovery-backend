@@ -71,11 +71,38 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, fail := service.SearchImage(r.Context(), id, req)
+	menuExplanation, fail := service.ExplainMenu(r.Context(), id, req)
 	if fail != nil {
 		codec.Failure(w, fail)
 		return
 	}
 
-	codec.Success(w, http.StatusOK, res)
+	codec.Success(w, http.StatusOK, menuExplanation)
+}
+
+func orderMenu(w http.ResponseWriter, r *http.Request) {
+	req, err := codec.DecodeReq[dto.MenuOrderRequest](r)
+	if err != nil {
+		codec.Failure(w, &fail.InvalidJsonBody)
+		return
+	}
+
+	if fail := req.Validate(); fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	id, fail := contextHelper.GetUserId(r.Context())
+	if fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	menuOrder, fail := service.OrderMenu(r.Context(), id, req)
+	if fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	codec.Success(w, http.StatusOK, menuOrder)
 }
