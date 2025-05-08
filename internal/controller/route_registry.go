@@ -17,4 +17,5 @@ func RegisterRoutes(handler *http.ServeMux) {
 	handler.HandleFunc("POST /auth/refresh", refresh)
 
 	handler.HandleFunc("GET /user/dislike-foods", getDislikeFoods)
+	handler.HandleFunc("PUT /user/dislike-foods", updateDislikeFoods)
 }

@@ -16,3 +16,19 @@ func GetDislikeFoods(ctx context.Context, id string) (*dto.GetDislikeFoodsRespon
 
 	return dto.FromDislikeFoods(user.DislikeFoods), nil
 }
+
+func UpdateDislikeFoods(ctx context.Context, id string, request *dto.UpdateDislikeFoodsResponse) *fail.Fail {
+	user, err := repository.GetUserById(ctx, id)
+	if err != nil {
+		return &fail.UserNotFound
+	}
+
+	user.DislikeFoods = request.DislikeFoods
+
+	err = repository.UpdateUser(ctx, id, user)
+	if err != nil {
+		return &fail.FailedUpdatingUser
+	}
+
+	return nil
+}

@@ -107,7 +107,7 @@ func updateUserLoginInfo(ctx context.Context, id string, user *domain.User, refr
 
 	user.RefreshToken = refreshToken
 
-	_ = repository.SetUser(ctx, id, user)
+	_ = repository.UpdateUser(ctx, id, user)
 }
 
 func getGoogleAuthenticatedUserId(sub string) string {
