@@ -1,6 +1,7 @@
 package token
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -77,16 +78,19 @@ func verify(tokenString string) (string, *fail.Fail) {
 		}
 		return []byte(util.JwtSecretKey), nil
 	})
+
 	if err != nil {
-		return "", &fail.SigningMethodMismatch
+		switch {
+		case errors.Is(err, jwt.ErrTokenExpired):
+			return "", &fail.TokenExpired
+		case errors.Is(err, jwt.ErrTokenSignatureInvalid):
+			return "", &fail.InvalidSignature
+		default:
+			return "", &fail.TokenIsWeird
+		}
 	}
 
-	id, fail := openClaims(token)
-	if fail != nil {
-		return "", fail
-	}
-
-	return id, nil
+	return openClaims(token)
 }
 
 func openClaims(token *jwt.Token) (string, *fail.Fail) {
@@ -97,14 +101,6 @@ func openClaims(token *jwt.Token) (string, *fail.Fail) {
 
 	if iss, ok := claims["iss"].(string); !ok || iss != issValue {
 		return "", &fail.InvalidIssuer
-	}
-
-	exp, ok := claims["exp"].(float64)
-	if !ok {
-		return "", &fail.InvalidClaims
-	}
-	if int64(exp) < time.Now().Unix() {
-		return "", &fail.TokenExpired
 	}
 
 	sub, ok := claims["sub"].(string)
