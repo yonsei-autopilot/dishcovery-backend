@@ -23,6 +23,7 @@ var (
 	RefreshTokenMismatch        = Fail{Code: "4007", Message: "Refresh Token Mismatches", Status: http.StatusUnauthorized}
 	GoogleSearchNotWorking      = Fail{Code: "4008", Message: "Google Search Not Working", Status: http.StatusInternalServerError}
 	FailedExplanationGeneration = Fail{Code: "4009", Message: "Failed Explanation Generation", Status: http.StatusInternalServerError}
+	FailedUpdatingUser          = Fail{Code: "4010", Message: "Failed Updating User", Status: http.StatusInternalServerError}
 
 	// token related fail
 	FailedCreatingToken   = Fail{Code: "5001", Message: "Failed Creating Token", Status: http.StatusInternalServerError}
@@ -32,6 +33,8 @@ var (
 	InvalidIssuer         = Fail{Code: "5005", Message: "Invalid Issuer", Status: http.StatusUnauthorized}
 	InvalidSubject        = Fail{Code: "5006", Message: "Invalid Subject", Status: http.StatusUnauthorized}
 	TokenNotInHeader      = Fail{Code: "5007", Message: "Token Not In Header", Status: http.StatusUnauthorized}
+	InvalidSignature      = Fail{Code: "5008", Message: "Token Signature Is Invalid", Status: http.StatusUnauthorized}
+	TokenIsWeird          = Fail{Code: "5009", Message: "Token Is Weird", Status: http.StatusUnauthorized}
 )
 
 type Fail struct {
