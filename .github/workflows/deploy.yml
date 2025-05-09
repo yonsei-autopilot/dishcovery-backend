@@ -1,0 +1,68 @@
+name: Deploy on GCP Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "체크아웃할 브랜치"
+        required: true
+        default: "main"
+
+env:
+  GCP_REGION: asia-northeast3
+  ARTIFACT_REPO: asia-northeast3-docker.pkg.dev/${{secrets.GCP_PROJECT_ID}}/${{secrets.GCP_ARTIFACT_REGISTRY}}
+  IMAGE_NAME: api-server
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Branch Checkout
+        uses: actions/checkout@v3
+
+      - name: Set image tag from commit SHA
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: "${{secrets.GCP_SA_KEY}}"
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{secrets.GCP_PROJECT_ID}}
+
+      - name: Get secrets from Secret Manager
+        run: |
+          gcloud secrets versions access latest --secret="environment" > .env
+          gcloud secrets versions access latest --secret="google-tts-application-credentials" > google-tts-application-credentials.json
+          gcloud secrets versions access latest --secret="firebase-application-credentials" > firebase-application-credentials.json
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{env.GCP_REGION}}-docker.pkg.dev
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{env.ARTIFACT_REPO}}/${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Update Cloud Run service
+        run: |
+          gcloud run deploy dishcovery \
+            --image=${{env.ARTIFACT_REPO}}/${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}} \
+            --region=${{env.GCP_REGION}} \
+            --platform=managed \
+            --allow-unauthenticated
