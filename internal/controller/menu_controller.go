@@ -8,6 +8,7 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/codec"
 	contextHelper "github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/context_helper"
 	dto "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/menu"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/dto/menu/google_tts"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/service"
 )
@@ -69,11 +70,80 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, fail := service.SearchImage(r.Context(), id, req)
+	menuExplanation, fail := service.ExplainMenu(r.Context(), id, req)
 	if fail != nil {
 		codec.Failure(w, fail)
 		return
 	}
 
-	codec.Success(w, http.StatusOK, res)
+	codec.Success(w, http.StatusOK, menuExplanation)
+}
+
+func getMenuOrderTexts(w http.ResponseWriter, r *http.Request) {
+	req, err := codec.DecodeReq[dto.GetMenuOrderTextsRequest](r)
+	if err != nil {
+		codec.Failure(w, &fail.InvalidJsonBody)
+		return
+	}
+
+	if fail := req.Validate(); fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	id, fail := contextHelper.GetUserId(r.Context())
+	if fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	menuOrder, fail := service.GetMenuOrderTexts(r.Context(), id, req)
+	if fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	codec.Success(w, http.StatusOK, menuOrder)
+}
+
+func getLanguageCodeForGoogleTts(w http.ResponseWriter, r *http.Request) {
+	req, err := codec.DecodeReq[google_tts.LanguageCodeForGoogleTtsRequest](r)
+	if err != nil {
+		codec.Failure(w, &fail.InvalidJsonBody)
+		return
+	}
+
+	if fail := req.Validate(); fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	languageCode, fail := service.GetLanguageCodeForGoogleTts(r.Context(), req)
+	if fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	codec.Success(w, http.StatusOK, languageCode)
+}
+
+func getMenuOrderSpeech(w http.ResponseWriter, r *http.Request) {
+	req, err := codec.DecodeReq[google_tts.MenuOrderSpeechRequest](r)
+	if err != nil {
+		codec.Failure(w, &fail.InvalidJsonBody)
+		return
+	}
+
+	if fail := req.Validate(); fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	languageCode, fail := service.GetMenuOrderSpeech(r.Context(), req)
+	if fail != nil {
+		codec.Failure(w, fail)
+		return
+	}
+
+	codec.Success(w, http.StatusOK, languageCode)
 }
