@@ -10,7 +10,7 @@ func RegisterRoutes(handler *http.ServeMux) {
 	handler.HandleFunc("POST /menus/translation", translateMenu)
 	handler.HandleFunc("GET /menus/translation/test-page", renderMenuTranslationPage)
 	handler.HandleFunc("POST /menus/explanation", explainMenu)
-	handler.HandleFunc("POST /menus/order/texts", getMenuOrderTexts)
+	handler.HandleFunc("POST /menus/order", orderMenu)
 	handler.HandleFunc("POST /menus/language-code-for-google-tts", getLanguageCodeForGoogleTts)
 	handler.HandleFunc("POST /menus/order/speech", getMenuOrderSpeech)
 

@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/gemini"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/google_tts"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/domain"
 	dto "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/menu"
 	answer "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/menu/gemini"
@@ -12,7 +14,7 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/repository"
 )
 
-func GetMenuOrderTexts(ctx context.Context, id string, request *dto.GetMenuOrderTextsRequest) (*dto.GetMenuOrderTextsResponse, *fail.Fail) {
+func OrderMenu(ctx context.Context, id string, request *dto.MenuOrderRequest) (*dto.MenuOrderResponse, *fail.Fail) {
 	user, err := repository.GetUserById(ctx, id)
 	if err != nil {
 		return nil, &fail.UserNotFound
@@ -31,10 +33,15 @@ func GetMenuOrderTexts(ctx context.Context, id string, request *dto.GetMenuOrder
 		return nil, &fail.FailedExplanationGeneration
 	}
 
-	return dto.FromMenuOrderAnswer(menuOrder), nil
+	orderAudio, inquiryAudio, fail := generateTts(ctx, menuOrder.OrderInForeignLanguage, menuOrder.InquiryForDislikeFoodsInForeignLanguage, request.ForeignLanguageCode)
+	if fail != nil {
+		return nil, fail
+	}
+
+	return dto.FromMenuOrderInfos(menuOrder, orderAudio, inquiryAudio), nil
 }
 
-func getPrompt(user *domain.User, request *dto.GetMenuOrderTextsRequest) string {
+func getPrompt(user *domain.User, request *dto.MenuOrderRequest) string {
 	return fmt.Sprintf(`
 Please generate four statements as follows:
 
@@ -59,4 +66,28 @@ func getMenuItemsDescription(menus []struct {
 		menuDescriptions += fmt.Sprintf("Dish: %s, Quantity: %s, Description: %s\n", menu.Name, menu.Count, menu.Description)
 	}
 	return menuDescriptions
+}
+
+func generateTts(ctx context.Context, orderText string, inquiryText string, languageCode string) (orderAudio, inquiryAudio string, failure *fail.Fail) {
+	var wg sync.WaitGroup
+	var audioResults [2]string
+	var ttsFail *fail.Fail
+
+	generateTts := func(text string, index int) {
+		defer wg.Done()
+		audioResults[index], ttsFail = google_tts.GetSpeech(ctx, text, languageCode)
+	}
+
+	wg.Add(2)
+
+	go generateTts(orderText, 0)
+	go generateTts(inquiryText, 1)
+
+	wg.Wait()
+
+	if ttsFail != nil {
+		return "", "", ttsFail
+	}
+
+	return audioResults[0], audioResults[1], nil
 }
