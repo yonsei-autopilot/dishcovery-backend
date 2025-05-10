@@ -70,18 +70,18 @@ func getMenuItemsDescription(menus []struct {
 
 func generateTts(ctx context.Context, orderText string, inquiryText string, languageCode string) (orderAudio, inquiryAudio string, failure *fail.Fail) {
 	var wg sync.WaitGroup
-	var audioResults [2]string
+	var orderAudioResult, inquiryAudioResult string
 	var ttsFail *fail.Fail
 
-	generateTts := func(text string, index int) {
+	generateTts := func(text string, result *string) {
 		defer wg.Done()
-		audioResults[index], ttsFail = google_tts.GetSpeech(ctx, text, languageCode)
+		*result, ttsFail = google_tts.GetSpeech(ctx, text, languageCode)
 	}
 
 	wg.Add(2)
 
-	go generateTts(orderText, 0)
-	go generateTts(inquiryText, 1)
+	go generateTts(orderText, &orderAudioResult)
+	go generateTts(inquiryText, &inquiryAudioResult)
 
 	wg.Wait()
 
@@ -89,5 +89,5 @@ func generateTts(ctx context.Context, orderText string, inquiryText string, lang
 		return "", "", ttsFail
 	}
 
-	return audioResults[0], audioResults[1], nil
+	return orderAudioResult, inquiryAudioResult, nil
 }
