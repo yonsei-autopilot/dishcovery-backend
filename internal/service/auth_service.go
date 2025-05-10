@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/google_oauth"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/token"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/domain"
 	dto "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/auth"
@@ -12,7 +13,7 @@ import (
 )
 
 func GoogleLogin(ctx context.Context, accessToken string) (*dto.LoginResponse, *fail.Fail) {
-	userInfo, err := repository.FetchUserInfo(accessToken)
+	userInfo, err := google_oauth.FetchUserInfo(accessToken)
 	if err != nil {
 		return nil, &fail.UserNotGoogleAuthenticated
 	}

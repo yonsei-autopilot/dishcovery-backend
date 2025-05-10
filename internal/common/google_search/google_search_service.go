@@ -1,4 +1,4 @@
-package repository
+package google_search
 
 import (
 	"fmt"

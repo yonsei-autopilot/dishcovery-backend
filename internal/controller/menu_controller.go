@@ -79,8 +79,8 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 	codec.Success(w, http.StatusOK, menuExplanation)
 }
 
-func getMenuOrderTexts(w http.ResponseWriter, r *http.Request) {
-	req, err := codec.DecodeReq[dto.GetMenuOrderTextsRequest](r)
+func orderMenu(w http.ResponseWriter, r *http.Request) {
+	req, err := codec.DecodeReq[dto.MenuOrderRequest](r)
 	if err != nil {
 		codec.Failure(w, &fail.InvalidJsonBody)
 		return
@@ -97,7 +97,7 @@ func getMenuOrderTexts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	menuOrder, fail := service.GetMenuOrderTexts(r.Context(), id, req)
+	menuOrder, fail := service.OrderMenu(r.Context(), id, req)
 	if fail != nil {
 		codec.Failure(w, fail)
 		return
