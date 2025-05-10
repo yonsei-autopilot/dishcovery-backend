@@ -1,4 +1,4 @@
-package repository
+package google_oauth
 
 import (
 	"fmt"

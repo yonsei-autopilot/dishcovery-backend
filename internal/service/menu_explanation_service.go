@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/gemini"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/google_search"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/domain"
 	dto "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/menu"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
@@ -17,7 +18,7 @@ func ExplainMenu(ctx context.Context, id string, request *dto.MenuExplanationReq
 		return nil, &fail.UserNotFound
 	}
 
-	imageSearchResult, failure := repository.SearchMenuImage(request)
+	imageSearchResult, failure := google_search.SearchMenuImage(request)
 	if failure != nil {
 		return nil, failure
 	}
