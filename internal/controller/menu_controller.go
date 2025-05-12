@@ -106,7 +106,7 @@ func orderMenu(w http.ResponseWriter, r *http.Request) {
 	codec.Success(w, http.StatusOK, menuOrder)
 }
 
-func getLanguageCodeForGoogleTts(w http.ResponseWriter, r *http.Request) {
+func getForeignLanguageOfMenu(w http.ResponseWriter, r *http.Request) {
 	req, err := codec.DecodeReq[google_tts.LanguageCodeForGoogleTtsRequest](r)
 	if err != nil {
 		codec.Failure(w, &fail.InvalidJsonBody)
@@ -118,7 +118,7 @@ func getLanguageCodeForGoogleTts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	languageCode, fail := service.GetLanguageCodeForGoogleTts(r.Context(), req)
+	languageCode, fail := service.GetForeignLanguageOfMenu(r.Context(), req)
 	if fail != nil {
 		codec.Failure(w, fail)
 		return

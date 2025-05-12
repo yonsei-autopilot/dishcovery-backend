@@ -2,10 +2,14 @@ package google_tts
 
 import answer "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/menu/gemini"
 
-type LanguageCodeForGoogleTtsResponse struct {
+type ForeignLanguageOfMenuResponse struct {
+	LanguageName string `json:"languageName"`
 	LanguageCode string `json:"languageCode"`
 }
 
-func FromLanguageCodeForGoogleTtsAnswer(a *answer.LanguageCodeForGoogleTtsAnswer) *LanguageCodeForGoogleTtsResponse {
-	return &LanguageCodeForGoogleTtsResponse{LanguageCode: a.LanguageCodeForGoogleTts}
+func FromGeminiAnswer(a *answer.ForeignLanguageOfMenuAnswer) *ForeignLanguageOfMenuResponse {
+	return &ForeignLanguageOfMenuResponse{
+		LanguageName: a.LanguageName,
+		LanguageCode: a.LanguageCodeForGoogleTts,
+	}
 }
