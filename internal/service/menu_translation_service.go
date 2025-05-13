@@ -51,42 +51,159 @@ func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageForma
 }
 
 func createBoundingBoxPrompt() string {
-	return `Detect 2D bounding boxes around all orderable elements in the menu image—such as menu item names, options, sub-items, etc.—but exclude any prices.
-For each detected box, output:
-	- "label: the exact text content inside the box  
-	- "box_2d": [ymin, xmin, ymax, xmax]`
+	return `Role
+You are a meticulous menu-image annotator. Your job is to mark every orderable element—menu item names, options, sub-items—while ignoring price text. Output must be precise, concise, and limited to the required JSON.
+
+Task
+1. Input
+   • one menu image
+
+2. Detect a 2-D bounding box for each piece of text that represents an orderable element:
+   • main item names
+   • options, add-ons, sizes, flavors, sub-items
+   (Skip any text that shows only a price.)
+
+3. For every detected box, create an object with the keys below and
+   return all objects as a JSON array.
+
+   label    the exact text content inside the box (do not alter the text)
+   box_2d   [ymin, xmin, ymax, xmax] coordinates of the box
+
+Guidelines
+• Before producing the final answer, think step by step and verify each candidate box:
+  - Confirm the text is orderable.  
+  - Confirm the text appears within the specified [ymin, xmin, ymax, xmax] box in the image.  
+  - Confirm the text is not solely a price or currency symbol.  
+  - Confirm the coordinate order is [ymin, xmin, ymax, xmax].
+• Include a box whenever the text can be selected during ordering.  
+• Omit boxes whose text is solely a price or currency symbol.  
+• Use the coordinate order [ymin, xmin, ymax, xmax] consistently.  
+• Return only the JSON array—no additional text.
+
+Output format
+[
+  { "label": "<text>", "box_2d": [ymin, xmin, ymax, xmax] },
+  …
+]`
 }
 
 func createMenuTranslationPrompt(boundingBoxData string, language string) string {
-	return fmt.Sprintf(`You are a menu-image translator AI.
+	return fmt.Sprintf(`- Role
+You are a meticulous bilingual culinary data-extractor and menu translator. Your responses are concise, professional, and focused on accurately mapping menu items and their options into structured data.
 
-Your input will consist of:
 
-1. A menu image.
-2. A JSON array of objects, each with:
-	- box_2d: [y1, x1, y2, x2]
-	- label: the raw text detected in that box
+- Task
+1. Input
+   • one menu image  
+   • a JSON array of objects:
+     { "box_2d": [y1, x1, y2, x2], "label": "<raw text>" }
 
-Your task: Analyze the image and the bounding boxes to determine which labels correspond to main menu items (dishes or drinks) and which correspond to options.
+2. Examine the image and decide for each label whether it represents
+   • a main menu item that can be ordered, or
+   • an option such as an add-on, side, size, or flavor.
 
-For each main menu item, output a JSON object with:
-- label: the original label text. the exact "lable" value from input JSON Data. DO NOT MODIFY.
-- box_2d: the original coordinates. the exact "box_2d" value from input JSON Data. DO NOT MODIFY.
-- price: price of the menu item.
-- originalItemName: a fully descriptive name of the dish or drink in its original language, inferred from visual and contextual clues. It must:
-	- Clearly state the exact food name
-	- If it’s a combo menu, specify which dish the combo belongs to
-	- Reflect the grouping and layout seen in the image
-- translatedItemName: the %s translation of that inferred name
-- availableOptions: an array of translated option names that apply to this item. Use an empty array if no options apply.
+3. For every main menu item, create an object with the keys below and
+   return all objects together as a JSON array.
 
-Use image context to determine which options belong to each item, and include any add-ons or sides detected.
-For each option label, assign it under the most logical parent item’s availableOptions, translating it into natural %s.
-Do not include any unorderable menu items.
-Option items must never be output as parent items.
-If a detected label is ambiguous, use image context to infer a more descriptive menu name.
-Return only the JSON array of main menu item objects as described—no additional text or commentary.
+   label               use the “label” value exactly as it appears in the input
+   box_2d              use the “box_2d” value exactly as it appears in the input
+   price               price shown for the item
+   originalItemName    a fully descriptive name in the original language
+   translatedItemName  a natural %s translation of originalItemName  
+                       (provide a meaningful equivalent rather than a phonetic transliteration)
+   availableOptions    an array of %s option names for this item
+                       (use [] if the item has no options)
 
-Following is JSON Array Object
-%s`, language, language, boundingBoxData)
+- Guidelines
+• Place each option label inside the availableOptions array of its parent item.  
+• Include only orderable menu items in the output.  
+• When a label could belong to several items, think step by step and attach it to the most plausible parent based on layout and visual grouping.  
+• Express combo relationships and other context clearly in originalItemName.  
+• Translate every name into natural %s, choosing meaningful wording over phonetic transliteration.  
+
+- Few-shot examples
+-----------------
+
+Example 1
+Input boxes
+[
+  { "box_2d": [0,5,20,100], "label": "스타벅스" },
+  { "box_2d": [5,5,20,100], "label": "에스프레소 류" },
+  { "box_2d": [10,10,40,200], "label": "스타벅스 아메리카노" },
+  { "box_2d": [10,210,40,300], "label": "₩4,500" },
+  { "box_2d": [50,10,80,200], "label": "Hot / Iced" }
+]
+
+Expected output
+[
+  {
+    "label": "스타벅스 아메리카노",
+    "box_2d": [10,10,40,200],
+    "price": 4500,
+    "originalItemName": "아메리카노",
+    "translatedItemName": "Americano",
+    "availableOptions": ["Hot", "Iced"]
+  }
+]
+
+Example 2
+Input boxes
+[
+  { "box_2d": [5,5,30,200], "label": "BBQ 치킨 연세대점" },
+  { "box_2d": [10,10,40,250], "label": "황금올리브 후라이드 세트" },
+  { "box_2d": [10,260,40,330], "label": "₩22,000" },
+  { "box_2d": [50,10,80,120], "label": "기본맛" },
+  { "box_2d": [50,130,80,250], "label": "매콤한맛" },
+  { "box_2d": [90,10,120,200], "label": "소스 추가" }
+]
+
+Expected output
+[
+  {
+    "label": "황금올리브 후라이드 세트",
+    "box_2d": [10,10,40,250],
+    "price": 22000,
+    "originalItemName": "후라이드 치킨 세트",
+    "translatedItemName": "Fried Chicken Combo",
+    "availableOptions": ["Original", "Spicy", "Extra Sauce"]
+  }
+]
+
+Example 3
+Input boxes
+[
+  { "box_2d": [5,120,10,200], "label": "John Pizzeria" },
+  { "box_2d": [10,10,40,150], "label": "존의 마르게리따 피자" },
+  { "box_2d": [10,160,40,220], "label": "₩16,000" },
+  { "box_2d": [50,10,80,150], "label": "치즈 추가" },
+  { "box_2d": [10,230,40,380], "label": "페페로니 피자" },
+  { "box_2d": [10,390,40,440], "label": "₩17,000" },
+  { "box_2d": [50,230,80,380], "label": "존의 페페로니 추가" }
+]
+
+Expected output
+[
+  {
+    "label": "존의 마르게리따 피자",
+    "box_2d": [10,10,40,150],
+    "price": 16000,
+    "originalItemName": "마르게리따 피자",
+    "translatedItemName": "Margherita Pizza",
+    "availableOptions": ["Add Cheese"]
+  },
+  {
+    "label": "존의 페페로니 피자",
+    "box_2d": [10,230,40,380],
+    "price": 17000,
+    "originalItemName": "페페로니 피자",
+    "translatedItemName": "Pepperoni Pizza",
+    "availableOptions": ["Extra Pepperoni"]
+  }
+]
+
+- Output format
+Respond with the JSON array of main-menu objects as your entire reply.
+
+Following is the bounding-box JSON list:
+%s`, language, language, language,  boundingBoxData)
 }
