@@ -14,7 +14,12 @@ func GetDislikeFoods(ctx context.Context, id string) (*dto.GetDislikeFoodsRespon
 		return nil, &fail.UserNotFound
 	}
 
-	return dto.FromDislikeFoods(user.DislikeFoods), nil
+	dislikeFoods := user.DislikeFoods
+	if dislikeFoods == nil {
+		dislikeFoods = make([]string, 0)
+	}
+
+	return dto.FromDislikeFoods(dislikeFoods), nil
 }
 
 func UpdateDislikeFoods(ctx context.Context, id string, request *dto.UpdateDislikeFoodsResponse) *fail.Fail {
