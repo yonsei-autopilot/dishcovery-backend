@@ -18,15 +18,19 @@ func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageForma
 		return nil, &fail.UserNotFound
 	}
 
-	temperature := float32(0.2)
+	temperature := float32(0.5)
+	topp := float32(0.8)
+	topk := int32(1)
 
 	boundingBoxResult, err := gemini.GeminiRequestBuilder().
 		WithContext(ctx).
-		WithModel("gemini-2.0-flash").
+		WithModel("gemini-2.5-pro-exp-03-25").
 		WithImage(imageBytes, imageFormat).
 		WithTemperature(&temperature).
+		WithTopK(&topk).
+		WithTopP(&topp).
 		WithPrompt(createBoundingBoxPrompt()).
-		ExpectResponseType("application/json").
+		// ExpectResponseType("application/json").
 		Generate()
 
 	if err != nil {
@@ -40,6 +44,7 @@ func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageForma
 		WithModel("gemini-2.0-flash-001").
 		WithImage(imageBytes, imageFormat).
 		WithTemperature(&temperature).
+		WithTopK(&topk).
 		WithPrompt(createMenuTranslationPrompt(boundingBoxResult, user.Language)).
 		ExpectStructuredOutput(output).
 		Generate()
@@ -51,40 +56,45 @@ func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageForma
 }
 
 func createBoundingBoxPrompt() string {
-	return `Role
-You are a meticulous menu-image annotator. Your job is to mark every orderable element—menu item names, options, sub-items—while ignoring price text. Output must be precise, concise, and limited to the required JSON.
+	return `Extract the text from the image
 
-Task
-1. Input
-   • one menu image
+Return just box_2d which will be location of detected text areas + label`
+	// `Role
+	// You are a meticulous menu-image annotator. Your job is to mark every orderable element—menu item names, options, sub-items—while ignoring price text. Output must be precise, concise, and limited to the required JSON.
 
-2. Detect a 2-D bounding box for each piece of text that represents an orderable element:
-   • main item names
-   • options, add-ons, sizes, flavors, sub-items
-   (Skip any text that shows only a price.)
+	// Task
+	// 1. Input
+	//    • one menu image
 
-3. For every detected box, create an object with the keys below and
-   return all objects as a JSON array.
+	// 2. Detect a 2-D bounding box for each piece of text that represents an orderable element:
+	//    • main item names
+	//    • options, add-ons, sizes, flavors, sub-items
+	//    (Skip any text that shows only a price.)
 
-   label    the exact text content inside the box (do not alter the text)
-   box_2d   [ymin, xmin, ymax, xmax] coordinates of the box
+	// 3. For every detected box, create an object with the keys below and
+	//    return all objects as a JSON array.
 
-Guidelines
-• Before producing the final answer, think step by step and verify each candidate box:
-  - Confirm the text is orderable.  
-  - Confirm the text appears within the specified [ymin, xmin, ymax, xmax] box in the image.  
-  - Confirm the text is not solely a price or currency symbol.  
-  - Confirm the coordinate order is [ymin, xmin, ymax, xmax].
-• Include a box whenever the text can be selected during ordering.  
-• Omit boxes whose text is solely a price or currency symbol.  
-• Use the coordinate order [ymin, xmin, ymax, xmax] consistently.  
-• Return only the JSON array—no additional text.
+	//    label    the exact text content inside the box (do not alter the text)
+	//    box_2d   [ymin, xmin, ymax, xmax] coordinates of the box
 
-Output format
-[
-  { "label": "<text>", "box_2d": [ymin, xmin, ymax, xmax] },
-  …
-]`
+	// Guidelines
+	// • Before producing the final answer, think step by step and verify each candidate box:
+	//   - Confirm the text is orderable.
+	//   - Confirm the text appears within the specified [ymin, xmin, ymax, xmax] box in the image.
+	//   - Confirm the text is not solely a price or currency symbol.
+	//   - Confirm the coordinate order is [ymin, xmin, ymax, xmax].
+	// • Include a box whenever the text can be selected during ordering.
+	// • Omit boxes whose text is solely a price or currency symbol.
+	// • Use the coordinate order [ymin, xmin, ymax, xmax] consistently.
+	// • Return only the JSON array—no additional text.
+
+	// Output format
+	// [
+	//
+	//	{ "label": "<text>", "box_2d": [ymin, xmin, ymax, xmax] },
+	//	…
+	//
+	// ]`
 }
 
 func createMenuTranslationPrompt(boundingBoxData string, language string) string {
@@ -205,5 +215,5 @@ Expected output
 Respond with the JSON array of main-menu objects as your entire reply.
 
 Following is the bounding-box JSON list:
-%s`, language, language, language,  boundingBoxData)
+%s`, language, language, language, boundingBoxData)
 }
