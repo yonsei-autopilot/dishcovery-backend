@@ -12,7 +12,7 @@ import (
 )
 
 func SearchMenuImage(request *dto.MenuExplanationRequest) (*dto.ImageSearchResult, *fail.Fail) {
-	adjustedQuery := url.QueryEscape(request.Name) + "+food+dish+photo+-menu+-logo"
+	adjustedQuery := url.QueryEscape(request.Name) + "+food+dish+photo+-menu+-logo+-site:instagram.com"
 
 	result, fail := search(adjustedQuery, 3)
 	if fail != nil {
@@ -24,7 +24,9 @@ func SearchMenuImage(request *dto.MenuExplanationRequest) (*dto.ImageSearchResul
 
 func search(adjustedQuery string, count int) (*dto.ImageSearchResult, *fail.Fail) {
 	searchURL := fmt.Sprintf(
-		"https://www.googleapis.com/customsearch/v1?q=%s&cx=%s&key=%s&searchType=image&num=%d",
+		"https://www.googleapis.com/customsearch/v1"+
+			"?q=%s&cx=%s&key=%s&searchType=image"+
+			"&fileType=jpg&imgType=photo&num=%d",
 		adjustedQuery, util.GoogleSearchEngineId, util.GoogleApiKey, count,
 	)
 
