@@ -24,7 +24,7 @@ func TranslateMenu(ctx context.Context, id string, imageBytes []byte, imageForma
 
 	boundingBoxResult, err := gemini.GeminiRequestBuilder().
 		WithContext(ctx).
-		WithModel("gemini-2.0-flash").
+		WithModel("gemini-2.5-pro-exp-03-25").
 		WithImage(imageBytes, imageFormat).
 		WithTemperature(&temperature).
 		WithTopK(&topk).
