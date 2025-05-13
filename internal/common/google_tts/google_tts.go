@@ -36,7 +36,7 @@ func GetSpeech(ctx context.Context, text string, languageCode string) (string, *
 				SsmlGender:   texttospeechpb.SsmlVoiceGender_NEUTRAL,
 			},
 			AudioConfig: &texttospeechpb.AudioConfig{
-				AudioEncoding: texttospeechpb.AudioEncoding_LINEAR16,
+				AudioEncoding: texttospeechpb.AudioEncoding_MP3,
 			},
 		})
 	if err != nil {
