@@ -1,0 +1,39 @@
+@startuml text_and_speech_for_ordering_seq
+
+participant Flutter as FL order 1
+participant Golang as GO order 2
+participant Firestore as FS order 3
+participant Gemini as GM order 4
+participant GoogleTts as GT order 5
+
+group Language Code for Google Tts of Menu [separated for optimization]
+FL -> GO: menu translations
+activate GO
+GO -> GM
+activate GM
+GO <- GM : language code for google tts
+deactivate GM
+FL <- GO
+deactivate GO
+end
+
+group Text & Speech for Ordering
+FL -> GO: menu items in cart &\nlanguage code for google tts
+activate GO
+GO -> FS
+activate FS
+GO <- FS: user\n(language, ..)
+deactivate FS
+GO -> GM
+activate GM
+GO <- GM: inquiry for food safety & order statement\nin both user language & menu language
+deactivate GM
+GO -> GT
+activate GT
+GO <- GT: multiple audios for inquiry and ordering
+deactivate GT
+FL <- GO: text & speech\nfor inquiry & ordering
+deactivate GO
+end
+
+@enduml

@@ -1,0 +1,22 @@
+@startuml bounding_box_and_translation_seq
+
+participant Flutter as FL order 1
+participant Golang as GO order 2
+participant Gemini as GM order 3
+
+group Bounding box & Translation of Menu
+FL -> GO: photo of menu
+activate GO
+GO -> GM
+activate GM
+GO <- GM: bounding boxes of menu items
+deactivate GM
+GO -> GM
+activate GM
+GO <- GM: translations of menu items
+deactivate GM
+FL <- GO: bounding boxes &\ntranslations
+deactivate GO
+end
+
+@enduml

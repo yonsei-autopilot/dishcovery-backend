@@ -1,0 +1,28 @@
+@startuml menu_explanation_seq
+
+participant Flutter as FL order 1
+participant Golang as GO order 2
+participant Firestore as FS order 3
+participant Gemini as GM order 4
+participant GoogleSearch as GS order 5
+
+group Explanation of Menu Item
+FL -> GO: menu item info
+activate GO
+GO -> FS
+activate FS
+GO <- FS: user\n(dislike foods, ..)
+deactivate FS
+GO -> GS
+activate GS
+GO <- GS: image links of menu item
+deactivate GS
+GO -> GM
+activate GM
+GO <- GM: explanation of menu item\n(brief explanation, ingredients,\navailabe options, foods to watch out, ..)
+deactivate GM
+FL <- GO: image links &\nexplanation
+deactivate GO
+end
+
+@enduml
