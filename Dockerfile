@@ -2,7 +2,9 @@
 FROM golang:1.24-alpine AS builder
 WORKDIR /app
 
-# For Cross-compile (Cloud Run x86)
+# For Cross-compile
+# (Cloud Run x86)
+# (PVE x86)
 ENV GOOS=linux \
     GOARCH=amd64 \
     CGO_ENABLED=0
