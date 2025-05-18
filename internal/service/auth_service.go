@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/google_oauth"
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util/token"
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/domain"
 	dto "github.com/yonsei-autopilot/smart-menu-backend/internal/dto/auth"
@@ -59,7 +59,7 @@ func SimpleLogin(ctx context.Context, req *dto.SimpleLoginRequest) (*dto.LoginRe
 func Register(ctx context.Context, req *dto.RegisterRequest) *fail.Fail {
 	id := getSimpleAuthenticatedUserId(req.LoginId)
 
-	user := req.ToUser(time.Now())
+	user := req.ToUser(util.GetKstNow())
 
 	err := repository.AddUser(ctx, id, user)
 	if err != nil {
@@ -93,7 +93,7 @@ func Refresh(ctx context.Context, req *dto.RefreshRequest) (*dto.RefreshResponse
 }
 
 func addNewUser(ctx context.Context, id string, userInfo *dto.UserInfoResponse) *fail.Fail {
-	newUser := userInfo.ToUser(time.Now())
+	newUser := userInfo.ToUser(util.GetKstNow())
 
 	err := repository.AddUser(ctx, id, newUser)
 	if err != nil {
@@ -104,7 +104,7 @@ func addNewUser(ctx context.Context, id string, userInfo *dto.UserInfoResponse) 
 }
 
 func updateUserLoginInfo(ctx context.Context, id string, user *domain.User, refreshToken string) {
-	user.LastLogin = time.Now()
+	user.LastLogin = util.GetKstNow()
 
 	user.RefreshToken = refreshToken
 

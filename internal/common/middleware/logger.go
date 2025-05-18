@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/yonsei-autopilot/smart-menu-backend/internal/common/util"
 )
 
 type wrappedWriter struct {
@@ -18,7 +20,7 @@ func (w *wrappedWriter) WriteHeader(statusCode int) {
 
 func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
+		start := util.GetKstNow()
 
 		wrapped := &wrappedWriter{
 			ResponseWriter: w,
