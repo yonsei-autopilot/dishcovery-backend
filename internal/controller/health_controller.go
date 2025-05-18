@@ -8,5 +8,5 @@ import (
 )
 
 func checkHealth(w http.ResponseWriter, r *http.Request) {
-	codec.Success(w, http.StatusOK, dto.HealthResponse{Description: "Server is healthy"})
+	codec.Success(w, dto.HealthResponse{Description: "Server is healthy"})
 }

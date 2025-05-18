@@ -23,7 +23,7 @@ func getDislikeFoods(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, response)
+	codec.Success(w, response)
 }
 
 func updateDislikeFoods(w http.ResponseWriter, r *http.Request) {
@@ -45,7 +45,7 @@ func updateDislikeFoods(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, nil)
+	codec.Success(w, nil)
 }
 
 func getLanguage(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +61,7 @@ func getLanguage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, response)
+	codec.Success(w, response)
 }
 
 func updateLanguage(w http.ResponseWriter, r *http.Request) {
@@ -88,5 +88,5 @@ func updateLanguage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, nil)
+	codec.Success(w, nil)
 }

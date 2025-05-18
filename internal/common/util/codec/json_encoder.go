@@ -8,9 +8,9 @@ import (
 	"github.com/yonsei-autopilot/smart-menu-backend/internal/fail"
 )
 
-func Success(w http.ResponseWriter, status int, data interface{}) {
+func Success(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
+	w.WriteHeader(http.StatusOK)
 
 	json.NewEncoder(w).Encode(dto.ApiResponse{
 		IsSuccess: true,

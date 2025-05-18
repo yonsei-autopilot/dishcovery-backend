@@ -27,7 +27,7 @@ func googleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, response)
+	codec.Success(w, response)
 }
 
 func simpleLogin(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +48,7 @@ func simpleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, response)
+	codec.Success(w, response)
 }
 
 func register(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +69,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, nil)
+	codec.Success(w, nil)
 }
 
 func refresh(w http.ResponseWriter, r *http.Request) {
@@ -90,5 +90,5 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, response)
+	codec.Success(w, response)
 }
