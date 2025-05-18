@@ -14,6 +14,7 @@ func main() {
 	firebase.InitializeFirebaseClient()
 	gemini.InitializeGeminiClient()
 	google_tts.InitializeGoogleTtsClient()
+	logger.InitializeLogger()
 	util.InitializeKst()
 	server.Start()
 }
