@@ -49,7 +49,7 @@ func translateMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, menuTranslation)
+	codec.Success(w, menuTranslation)
 }
 
 func explainMenu(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +76,7 @@ func explainMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, menuExplanation)
+	codec.Success(w, menuExplanation)
 }
 
 func orderMenu(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +103,7 @@ func orderMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, menuOrder)
+	codec.Success(w, menuOrder)
 }
 
 func getForeignLanguageOfMenu(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +124,7 @@ func getForeignLanguageOfMenu(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, languageCode)
+	codec.Success(w, languageCode)
 }
 
 func getMenuOrderSpeech(w http.ResponseWriter, r *http.Request) {
@@ -145,5 +145,5 @@ func getMenuOrderSpeech(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codec.Success(w, http.StatusOK, languageCode)
+	codec.Success(w, languageCode)
 }

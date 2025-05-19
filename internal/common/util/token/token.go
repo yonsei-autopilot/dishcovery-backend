@@ -60,8 +60,8 @@ func create(id string, durationHours float32) (string, *fail.Fail) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"iss": issValue,
 		"sub": id,
-		"exp": time.Now().Add(expiration).Unix(),
-		"iat": time.Now().Unix(),
+		"exp": util.GetKstNow().Add(expiration).Unix(),
+		"iat": util.GetKstNow().Unix(),
 	})
 
 	result, err := token.SignedString([]byte(util.JwtSecretKey))
